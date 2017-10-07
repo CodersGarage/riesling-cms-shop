@@ -7,13 +7,16 @@ import (
 
 var config gjson.Result
 
-func InitAppConfig() {
-	value, err := ioutil.ReadFile("./app.json")
-
+func InitAppConfigWithPath(configPath string) {
+	value, err := ioutil.ReadFile(configPath)
 	if err != nil {
 		panic(err)
 	}
 	config = gjson.Parse(string(value))
+}
+
+func InitAppConfig() {
+	InitAppConfigWithPath("./app.json")
 }
 
 func GetAppConfig() gjson.Result {
