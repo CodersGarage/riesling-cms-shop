@@ -1,14 +1,24 @@
 {
   "default": {
-    "appUri": "0.0.0.0:8080",
-    "appName": "riesling-cms-core",
-    "appVersion": "0.1beta",
-    "appMode": "debug",
-    "developer": "Sakib Sami [root@sakib.ninja]"
+    "app_uri": "0.0.0.0:8080",
+    "app_name": "riesling-cms-core",
+    "app_version": "0.1beta",
+    "app_mode": "debug"
+  },
+  "security": {
+    "registration_enabled": true,
+    "auth_uri": "http://localhost:8080/auth/token/verify"
   },
   "databases": {
     "mongodb": {
       "uri": "mongodb://cloud.sakib.ninja:27717"
     }
+  },
+  "credit": {
+    "author": "Sakib Sami [root@sakib.ninja]",
+    "license": "Apache 2",
+    "contributors": [
+      "Sakib Sami"
+    ]
   }
 }

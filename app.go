@@ -15,8 +15,8 @@ func main() {
 
 	app.PrintLog("main", "Application configuration complete.")
 	app.PrintLog("main", "Application Running {"+
-		"\n\tAppMode : "+ app.GetAppConfig().Get("default.appMode").String()+
-		"\n\tAppAddress : "+ app.GetAppConfig().Get("default.appUri").String()+
+		"\n\tAppMode : "+ app.GetAppConfig().Get("default.app_mode").String()+
+		"\n\tAppAddress : "+ app.GetAppConfig().Get("default.app_uri").String()+
 		"\n}")
 	app.PrintLog("main", "Initializing Routes...")
 	app.InitRoutes()
