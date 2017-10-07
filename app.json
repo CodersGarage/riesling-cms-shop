@@ -1,7 +1,9 @@
 {
   "default": {
+    "appUri": "0.0.0.0:8080",
     "appName": "riesling-cms-core",
     "appVersion": "0.1beta",
+    "appMode": "release",
     "developer": "Sakib Sami [root@sakib.ninja]"
   },
   "databases": {

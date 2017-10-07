@@ -6,8 +6,11 @@ import (
 
 func main() {
 	app.InitAppConfig()
-	config := app.GetAppConfig()
-	println("AppName : ", config.Get("default.appName").String())
-	println("AppVersion : ", config.Get("default.appVersion").String())
-	println("AppDeveloper : ", config.Get("default.developer").String())
+	app.PrintLog("main", "Application configuration complete.")
+	app.PrintLog("main", "Application Running {"+
+		"\n\tAppMode : "+ app.GetAppConfig().Get("default.appMode").String()+
+		"\n\tAppAddress : "+ app.GetAppConfig().Get("default.appUri").String()+
+		"\n}")
+	app.PrintLog("main", "Initializing Routes...")
+	app.InitRoutes()
 }
