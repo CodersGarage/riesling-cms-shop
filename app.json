@@ -1,0 +1,12 @@
+{
+  "default": {
+    "appName": "riesling-cms-core",
+    "appVersion": "0.1beta",
+    "developer": "Sakib Sami [root@sakib.ninja]"
+  },
+  "databases": {
+    "mongodb": {
+      "uri": "mongodb://cloud.sakib.ninja:27717"
+    }
+  }
+}
