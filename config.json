@@ -1,9 +1,9 @@
 {
-  "default": {
-    "app_uri": "0.0.0.0:8080",
-    "app_name": "riesling-cms-core",
-    "app_version": "0.1beta",
-    "app_mode": "debug"
+  "app": {
+    "uri": "0.0.0.0:8080",
+    "name": "riesling-cms-core",
+    "version": "0.1beta",
+    "mode": "debug"
   },
   "security": {
     "registration_enabled": true,
@@ -13,6 +13,10 @@
     "mongodb": {
       "uri": "mongodb://cloud.sakib.ninja:27717"
     }
+  },
+  "others": {
+    "pid_file": "/Users/s4kib/DevEnv/pid",
+    "log_file": "/Users/s4kib/DevEnv/logs"
   },
   "credit": {
     "author": "Sakib Sami [root@sakib.ninja]",
