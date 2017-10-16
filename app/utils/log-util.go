@@ -26,7 +26,6 @@ func LogF(tag string, msg interface{}) {
 		logFile, err = os.Open(viper.GetString("others.log_file"))
 	}
 	if err != nil {
-		logFile.Write([]byte(msg))
 		logFile.WriteString(fmt.Sprintf("%s : %v", tag, msg))
 	}
 }
