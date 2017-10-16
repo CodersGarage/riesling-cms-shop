@@ -1,10 +1,10 @@
 package main
 
 import (
-	"riesling-cms-core/app/cmd"
 	"fmt"
 	"os"
-	"riesling-cms-core/app/config"
+	"riesling-cms-shop/app/config"
+	"riesling-cms-shop/app/cmd"
 )
 
 func main() {

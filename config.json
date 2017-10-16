@@ -1,13 +1,12 @@
 {
   "app": {
-    "uri": "0.0.0.0:8080",
-    "name": "riesling-cms-core",
+    "uri": "0.0.0.0:8081",
+    "name": "riesling-cms-shop",
     "version": "0.1beta",
     "mode": "debug"
   },
-  "security": {
-    "registration_enabled": true,
-    "auth_uri": "http://localhost:8080/auth/token/verify"
+  "authorization": {
+    "url": "http://localhost:8080/api/v1/auth"
   },
   "databases": {
     "mongodb": {
@@ -15,8 +14,8 @@
     }
   },
   "others": {
-    "pid_file": "/Users/s4kib/DevEnv/pid",
-    "log_file": "/Users/s4kib/DevEnv/logs"
+    "pid_file": "/Users/s4kib/DevEnv/shoppid",
+    "log_file": "/Users/s4kib/DevEnv/shoplogs"
   },
   "credit": {
     "author": "Sakib Sami [root@sakib.ninja]",

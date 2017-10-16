@@ -4,9 +4,9 @@ import (
 	"github.com/spf13/cobra"
 	"fmt"
 	"github.com/spf13/viper"
-	"riesling-cms-core/app/routes"
-	"riesling-cms-core/app/utils"
 	"os/exec"
+	"riesling-cms-shop/app/routes"
+	"riesling-cms-shop/app/utils"
 )
 
 var RootCmd = cobra.Command{}
