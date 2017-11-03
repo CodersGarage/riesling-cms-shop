@@ -194,3 +194,12 @@ func (p *Product) FindDrafts(pageNow int) ProductResult {
 	result.ProductStat = p.FindStat(info)
 	return result
 }
+
+func (p *Product) Search(query bson.M, pageNow int) ProductResult {
+	q, info := p.ProductQuery(query, pageNow)
+	it := q.Iter()
+	result := ProductResult{}
+	result.Products = p.IteratorToArray(it)
+	result.ProductStat = p.FindStat(info)
+	return result
+}

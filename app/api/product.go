@@ -6,6 +6,10 @@ import (
 	"github.com/s4kibs4mi/govalidator"
 	"riesling-cms-shop/app/utils"
 	"strconv"
+	"gopkg.in/mgo.v2/bson"
+	"encoding/json"
+	"io/ioutil"
+	"fmt"
 )
 
 /**
@@ -121,6 +125,33 @@ func FindProductsDrafts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	products := product.FindDrafts(page)
+	resp := APIResponse{
+		Code: http.StatusOK,
+		Data: products,
+	}
+	ServeAsJSON(resp, w)
+	return
+}
+
+func SearchProducts(w http.ResponseWriter, r *http.Request) {
+	product := data.Product{}
+	value := GetURLParam("page", r)
+	page, err := strconv.Atoi(value)
+	var query bson.M
+	body, err := ioutil.ReadAll(r.Body)
+	err = json.Unmarshal(body, &query)
+	if err != nil {
+		fmt.Println(err)
+
+		products := product.Search(query, 0)
+		resp := APIResponse{
+			Code: http.StatusOK,
+			Data: products,
+		}
+		ServeAsJSON(resp, w)
+		return
+	}
+	products := product.Search(query, page)
 	resp := APIResponse{
 		Code: http.StatusOK,
 		Data: products,
