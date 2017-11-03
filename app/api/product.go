@@ -84,3 +84,47 @@ func FindProducts(w http.ResponseWriter, r *http.Request) {
 	ServeAsJSON(resp, w)
 	return
 }
+
+func FindProductsPublished(w http.ResponseWriter, r *http.Request) {
+	product := data.Product{}
+	value := GetURLParam("page", r)
+	page, err := strconv.Atoi(value)
+	if err != nil {
+		products := product.FindPublished(0)
+		resp := APIResponse{
+			Code: http.StatusOK,
+			Data: products,
+		}
+		ServeAsJSON(resp, w)
+		return
+	}
+	products := product.FindPublished(page)
+	resp := APIResponse{
+		Code: http.StatusOK,
+		Data: products,
+	}
+	ServeAsJSON(resp, w)
+	return
+}
+
+func FindProductsDrafts(w http.ResponseWriter, r *http.Request) {
+	product := data.Product{}
+	value := GetURLParam("page", r)
+	page, err := strconv.Atoi(value)
+	if err != nil {
+		products := product.FindDrafts(0)
+		resp := APIResponse{
+			Code: http.StatusOK,
+			Data: products,
+		}
+		ServeAsJSON(resp, w)
+		return
+	}
+	products := product.FindDrafts(page)
+	resp := APIResponse{
+		Code: http.StatusOK,
+		Data: products,
+	}
+	ServeAsJSON(resp, w)
+	return
+}

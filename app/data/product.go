@@ -4,8 +4,8 @@ import (
 	"gopkg.in/mgo.v2/bson"
 	"github.com/go-bongo/bongo"
 	"gopkg.in/mgo.v2"
-	"math"
 	"riesling-cms-shop/app/conn"
+	"math"
 )
 
 /**
@@ -78,63 +78,81 @@ func (p *Product) Delete(hash string) bool {
 	return false
 }
 
-func ProductQuery(query bson.M, pageNow int) *mgo.Query {
-	collection := conn.GetMGoCollection(PRODUCT_COLLECTION_NAME)
-	return collection.Find(query).
-		Skip(PRODUCT_PER_PAGE * pageNow).
-		Limit(PRODUCT_PER_PAGE).
-		Sort("createdAt")
-}
-
-func (p *Product) CountQuery(query bson.M, pageNow int) int {
-	n, err := ProductQuery(query, pageNow).Count()
-	if err != nil {
-		return 0
+func (p *Product) ProductQuery(query bson.M, pageNow int) (*mgo.Query, *bongo.PaginationInfo) {
+	if pageNow <= 0 {
+		pageNow = 1
 	}
-	return n
+	queryPage := pageNow
+	if queryPage > 0 {
+		queryPage--
+	}
+	collection := conn.GetCollection(PRODUCT_COLLECTION_NAME)
+	q := collection.Collection().Find(query).
+		Skip(PRODUCT_PER_PAGE * queryPage).
+		Limit(PRODUCT_PER_PAGE).
+		Sort("-$natural")
+
+	count, _ := q.Count()
+	pagination := p.Paginate(query, count, pageNow)
+	pagination.Current = pageNow
+	return q, pagination
 }
 
-func (p *Product) FindQuery(query bson.M, pageNow int) *mgo.Iter {
-	return ProductQuery(query, pageNow).Iter()
+func (p *Product) Paginate(query bson.M, count, page int) *bongo.PaginationInfo {
+	op, _ := conn.GetCollection(PRODUCT_COLLECTION_NAME).Find(query).Paginate(PRODUCT_PER_PAGE, page)
+	info := &bongo.PaginationInfo{}
+	totalPages := op.TotalPages
+	if page < 1 {
+		page = 1
+	} else if page > totalPages {
+		page = totalPages
+	}
+
+	info.TotalPages = totalPages
+	info.PerPage = PRODUCT_PER_PAGE
+	info.Current = page
+	info.TotalRecords = op.TotalRecords
+
+	if info.Current < info.TotalPages {
+		info.RecordsOnPage = info.PerPage
+	} else {
+		info.RecordsOnPage = int(math.Mod(float64(count), float64(PRODUCT_PER_PAGE)))
+		if info.RecordsOnPage == 0 && count > 0 {
+			info.RecordsOnPage = PRODUCT_PER_PAGE
+		}
+	}
+	return info
+}
+
+func (p *Product) FindQuery(query bson.M, pageNow int) (*mgo.Iter, *bongo.PaginationInfo) {
+	q, info := p.ProductQuery(query, pageNow)
+	return q.Iter(), info
 }
 
 func (p *Product) Find(hash string) bool {
-	it := p.FindQuery(bson.M{
+	it, _ := p.FindQuery(bson.M{
 		"hash": hash,
 	}, 0)
 	return it.Next(p)
 }
 
 func (p *Product) IsProductExists(code string) bool {
-	it := p.FindQuery(bson.M{
+	it, _ := p.FindQuery(bson.M{
 		"code": code,
 	}, 0)
 	return it.Next(p)
 }
 
-func (p *Product) FindStatQuery(query *mgo.Query, pageNow int) ProductStat {
-	total, err := conn.GetMGoCollection(PRODUCT_COLLECTION_NAME).Count()
-	count, err := query.Count()
+func (p *Product) FindStat(info *bongo.PaginationInfo) ProductStat {
 	stat := ProductStat{}
-	if err != nil {
-		return stat
+	if info != nil {
+		stat.PageOn = info.Current
+		stat.ProductOnPage = info.RecordsOnPage
+		stat.ProductPerPage = info.PerPage
+		stat.ProductTotal = info.TotalRecords
+		stat.PageTotal = info.TotalPages
 	}
-	totalPages := int(math.Ceil(float64(total) / float64(PRODUCT_PER_PAGE)))
-	stat.ProductPerPage = PRODUCT_PER_PAGE
-	if count > PRODUCT_PER_PAGE {
-		stat.ProductOnPage = PRODUCT_PER_PAGE
-	} else {
-		stat.ProductOnPage = count
-	}
-	stat.PageTotal = totalPages
-	stat.ProductTotal = total
-	stat.PageOn = pageNow
 	return stat
-}
-
-func (p *Product) FindStat(query bson.M, pageNow int) ProductStat {
-	q := ProductQuery(query, pageNow)
-	return p.FindStatQuery(q, pageNow)
 }
 
 func (p *Product) IteratorToArray(it *mgo.Iter) []Product {
@@ -147,32 +165,32 @@ func (p *Product) IteratorToArray(it *mgo.Iter) []Product {
 }
 
 func (p *Product) FindAll(pageNow int) ProductResult {
-	q := ProductQuery(bson.M{}, pageNow)
+	q, info := p.ProductQuery(bson.M{}, pageNow)
 	it := q.Iter()
 	result := ProductResult{}
+	result.ProductStat = p.FindStat(info)
 	result.Products = p.IteratorToArray(it)
-	result.ProductStat = p.FindStatQuery(q, pageNow)
 	return result
 }
 
 func (p *Product) FindPublished(pageNow int) ProductResult {
-	q := ProductQuery(bson.M{
+	q, info := p.ProductQuery(bson.M{
 		"status": PRODUCT_STATUS_PUBLISHED,
 	}, pageNow)
 	it := q.Iter()
 	result := ProductResult{}
 	result.Products = p.IteratorToArray(it)
-	result.ProductStat = p.FindStatQuery(q, pageNow)
+	result.ProductStat = p.FindStat(info)
 	return result
 }
 
 func (p *Product) FindDrafts(pageNow int) ProductResult {
-	q := ProductQuery(bson.M{
+	q, info := p.ProductQuery(bson.M{
 		"status": PRODUCT_STATUS_DRAFT,
 	}, pageNow)
 	it := q.Iter()
 	result := ProductResult{}
 	result.Products = p.IteratorToArray(it)
-	result.ProductStat = p.FindStatQuery(q, pageNow)
+	result.ProductStat = p.FindStat(info)
 	return result
 }

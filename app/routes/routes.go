@@ -22,6 +22,8 @@ func InitRoutes() {
 	v1 := RootRoute.PathPrefix("/api/v1").Subrouter()
 	v1.HandleFunc("/product", api.SelfAuth(api.CreateProduct)).Methods("POST")
 	v1.HandleFunc("/product", api.SelfAuth(api.FindProducts)).Methods("GET")
+	v1.HandleFunc("/product/published", api.FindProductsPublished).Methods("GET")
+	v1.HandleFunc("/product/saved", api.SelfAuth(api.FindProductsDrafts)).Methods("GET")
 
 	go http.ListenAndServe(viper.GetString("app.uri"), RootRoute)
 	WaitGroup.Add(1)
