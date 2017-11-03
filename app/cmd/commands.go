@@ -9,6 +9,13 @@ import (
 	"riesling-cms-shop/app/utils"
 )
 
+/**
+ * := Coded with love by Sakib Sami on 3/11/17.
+ * := root@sakib.ninja
+ * := www.sakib.ninja
+ * := Coffee : Dream : Code
+ */
+
 var RootCmd = cobra.Command{}
 var serverCmd = cobra.Command{
 	Use:   "server",

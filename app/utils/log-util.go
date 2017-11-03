@@ -6,6 +6,13 @@ import (
 	"os"
 )
 
+/**
+ * := Coded with love by Sakib Sami on 3/11/17.
+ * := root@sakib.ninja
+ * := www.sakib.ninja
+ * := Coffee : Dream : Code
+ */
+
 var logFile *os.File
 var err error
 
@@ -18,7 +25,7 @@ func LogD(tag string, msg interface{}) {
 }
 
 func LogF(tag string, msg interface{}) {
-	_, err := os.Stat(viper.GetString("others.log_file"))
+	_, err = os.Stat(viper.GetString("others.log_file"))
 	if os.IsNotExist(err) {
 		logFile, err = os.Create(viper.GetString("others.log_file"))
 	}

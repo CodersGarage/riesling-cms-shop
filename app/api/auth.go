@@ -8,13 +8,12 @@ import (
 	"riesling-cms-shop/app/utils"
 )
 
-//{
-//"code": 200,
-//"data": {
-//"is_valid": true,
-//"level": 1
-//}
-//}
+/**
+ * := Coded with love by Sakib Sami on 3/11/17.
+ * := root@sakib.ninja
+ * := www.sakib.ninja
+ * := Coffee : Dream : Code
+ */
 
 type AuthResponse struct {
 	Code int                    `json:"code"`
