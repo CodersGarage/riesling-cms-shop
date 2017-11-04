@@ -69,7 +69,6 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	productRequest := data.ProductRequest{}
 	rules := govalidator.MapData{
-		"hash": []string{"required", "between:1,100"},
 		"code": []string{"required", "between:1,50"},
 		"name": []string{"required", "between:1,100"},
 	}
@@ -81,6 +80,7 @@ func UpdateProduct(w http.ResponseWriter, r *http.Request) {
 	vr := govalidator.New(options)
 	err := vr.ValidateJSON()
 	if len(err) == 0 {
+		productRequest.Hash = GetURLParam("hash", r)
 		product, isFound := productRequest.ProcessUpdate()
 		if isFound {
 			product.UpdatedBy = GetUserHashFromHeader(r)
