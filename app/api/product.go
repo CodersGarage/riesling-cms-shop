@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"riesling-cms-shop/app/data"
 	"github.com/s4kibs4mi/govalidator"
-	"riesling-cms-shop/app/utils"
 	"strconv"
 	"gopkg.in/mgo.v2/bson"
 	"encoding/json"
@@ -20,7 +19,7 @@ import (
  */
 
 func CreateProduct(w http.ResponseWriter, r *http.Request) {
-	product := data.Product{}
+	productRequest := data.ProductRequest{}
 	rules := govalidator.MapData{
 		"code": []string{"required", "between:1,50"},
 		"name": []string{"required", "between:1,100"},
@@ -28,14 +27,14 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 	options := govalidator.Options{
 		Request: r,
 		Rules:   rules,
-		Data:    &product,
+		Data:    &productRequest,
 	}
 	vr := govalidator.New(options)
 	err := vr.ValidateJSON()
 	if len(err) == 0 {
-		product.Hash = utils.GetUUID()
-		product.Favourites = 0
-		product.TotalDownload = 0
+		product := productRequest.ProcessCreate()
+		product.CreatedBy = GetUserHashFromHeader(r)
+		product.UpdatedBy = GetUserHashFromHeader(r)
 		if !product.IsProductExists(product.Code) {
 			if product.Save() {
 				resp := APIResponse{
@@ -56,6 +55,54 @@ func CreateProduct(w http.ResponseWriter, r *http.Request) {
 		resp := APIResponse{
 			Code:    http.StatusConflict,
 			Message: "Product code already exists.",
+		}
+		ServeAsJSON(resp, w)
+		return
+	}
+	resp := APIResponse{
+		Code:  http.StatusUnprocessableEntity,
+		Error: err,
+	}
+	ServeAsJSON(resp, w)
+}
+
+func UpdateProduct(w http.ResponseWriter, r *http.Request) {
+	productRequest := data.ProductRequest{}
+	rules := govalidator.MapData{
+		"hash": []string{"required", "between:1,100"},
+		"code": []string{"required", "between:1,50"},
+		"name": []string{"required", "between:1,100"},
+	}
+	options := govalidator.Options{
+		Request: r,
+		Rules:   rules,
+		Data:    &productRequest,
+	}
+	vr := govalidator.New(options)
+	err := vr.ValidateJSON()
+	if len(err) == 0 {
+		product, isFound := productRequest.ProcessUpdate()
+		if isFound {
+			product.UpdatedBy = GetUserHashFromHeader(r)
+			if product.Save() {
+				resp := APIResponse{
+					Code:    http.StatusOK,
+					Message: "Product has been updated.",
+					Data:    product,
+				}
+				ServeAsJSON(resp, w)
+				return
+			}
+			resp := APIResponse{
+				Code:    http.StatusInternalServerError,
+				Message: "Something went wrong.",
+			}
+			ServeAsJSON(resp, w)
+			return
+		}
+		resp := APIResponse{
+			Code:    http.StatusNotFound,
+			Message: "Product doesn't exists.",
 		}
 		ServeAsJSON(resp, w)
 		return

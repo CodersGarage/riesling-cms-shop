@@ -30,3 +30,7 @@ func ServeAsJSON(resp APIResponse, w http.ResponseWriter) {
 func GetURLParam(key string, r *http.Request) string {
 	return r.URL.Query().Get(key)
 }
+
+func GetUserHashFromHeader(r *http.Request) string {
+	return r.Header.Get(HASH)
+}
