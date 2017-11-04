@@ -50,8 +50,8 @@ type ProductStat struct {
 }
 
 type ProductResult struct {
-	Products    []Product   `json:"products"`
-	ProductStat ProductStat `json:"stat"`
+	Products    []Product    `json:"products"`
+	ProductStat *ProductStat `json:"stat,omitempty"`
 }
 
 func (p *Product) Save() bool {
@@ -143,7 +143,7 @@ func (p *Product) IsProductExists(code string) bool {
 	return it.Next(p)
 }
 
-func (p *Product) FindStat(info *bongo.PaginationInfo) ProductStat {
+func (p *Product) FindStat(info *bongo.PaginationInfo) *ProductStat {
 	stat := ProductStat{}
 	if info != nil {
 		stat.PageOn = info.Current
@@ -152,7 +152,7 @@ func (p *Product) FindStat(info *bongo.PaginationInfo) ProductStat {
 		stat.ProductTotal = info.TotalRecords
 		stat.PageTotal = info.TotalPages
 	}
-	return stat
+	return &stat
 }
 
 func (p *Product) IteratorToArray(it *mgo.Iter) []Product {
@@ -160,6 +160,17 @@ func (p *Product) IteratorToArray(it *mgo.Iter) []Product {
 	temp := Product{}
 	for it.Next(&temp) {
 		products = append(products, temp)
+	}
+	return products
+}
+
+func (p *Product) IteratorToArrayPublishedOnly(it *mgo.Iter) []Product {
+	products := []Product{}
+	temp := Product{}
+	for it.Next(&temp) {
+		if temp.Status == PRODUCT_STATUS_PUBLISHED {
+			products = append(products, temp)
+		}
 	}
 	return products
 }
@@ -196,10 +207,9 @@ func (p *Product) FindDrafts(pageNow int) ProductResult {
 }
 
 func (p *Product) Search(query bson.M, pageNow int) ProductResult {
-	q, info := p.ProductQuery(query, pageNow)
+	q, _ := p.ProductQuery(query, pageNow)
 	it := q.Iter()
 	result := ProductResult{}
-	result.Products = p.IteratorToArray(it)
-	result.ProductStat = p.FindStat(info)
+	result.Products = p.IteratorToArrayPublishedOnly(it)
 	return result
 }
